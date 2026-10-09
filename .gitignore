@@ -18,3 +18,12 @@ data/*.sqlite3-wal
 
 .coverage
 coverage.xml
+
+# Never commit database snapshots or private backup data.
+backups/
+*.sqlite3
+*.sqlite3-wal
+*.sqlite3-shm
+*.db
+*.db-wal
+*.db-shm
