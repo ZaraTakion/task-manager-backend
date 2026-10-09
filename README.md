@@ -115,7 +115,9 @@ a lista inteira. Para grandes volumes, prefira informar `limit`.
 
 ```bash
 python -m pip install -r requirements-dev.txt
-python -m unittest discover -s tests -v
+coverage run --source=app -m unittest discover -s tests -v
+coverage report -m
+coverage xml -o coverage.xml
 python -m compileall -q app tests
 ruff check app tests
 ```
@@ -123,7 +125,7 @@ ruff check app tests
 O GitHub Actions verifica lint e executa testes em Python **3.10, 3.11, 3.12
 e 3.13** a cada pull request para `main`. A suíte cobre CRUD, reinicialização
 da aplicação, falhas de validação, isolamento de banco, autenticação opcional
-e integridade transacional.
+e integridade transacional. O workflow também exporta `coverage.xml` por versão de Python; a porcentagem não substitui a revisão dos cenários críticos.
 
 ## Organização
 
