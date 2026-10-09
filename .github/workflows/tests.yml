@@ -21,7 +21,7 @@ jobs:
           cache: pip
           cache-dependency-path: requirements-dev.txt
       - run: python -m pip install -r requirements-dev.txt
-      - run: ruff check app tests
+      - run: ruff check app tests scripts
 
   tests:
     name: Tests (Python ${{ matrix.python-version }})
@@ -41,7 +41,7 @@ jobs:
       - run: coverage run --source=app -m unittest discover -s tests -v
       - run: coverage report -m
       - run: coverage xml -o coverage.xml
-      - run: python -m compileall -q app tests
+      - run: python -m compileall -q app tests scripts
       - name: Upload coverage report
         uses: actions/upload-artifact@v4
         with:
