@@ -6,7 +6,8 @@ import os
 import secrets
 from pathlib import Path
 
-from fastapi import Depends, FastAPI, HTTPException, Path as APIPath, Query, Response, Security, status
+from fastapi import Depends, FastAPI, HTTPException, Query, Response, Security, status
+from fastapi import Path as APIPath
 from fastapi.security import APIKeyHeader
 
 from app.schemas import TaskCreate, TaskRecord, TaskUpdate
