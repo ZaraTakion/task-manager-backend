@@ -5,7 +5,8 @@
 - `app/main.py`: fábrica FastAPI, endpoints e dependência de autenticação opcional.
 - `app/schemas.py`: contratos de entrada/saída e validações Pydantic v2.
 - `app/storage.py`: operações SQL parametrizadas, transações curtas e tipos dos registros.
-- `tests/`: testes de contrato HTTP e regressão da persistência SQLite.
+- `tests/`: testes de contrato HTTP, backup, persistência e concorrência SQLite.
+- `scripts/backup_sqlite.py`: backup consistente usando `sqlite3.Connection.backup`; recusa sobrescrever destino e verifica integridade.
 
 `create_app(database_path)` permite criar instâncias isoladas sem afetar o banco padrão.
 O arquivo SQLite é inicializado no momento em que a aplicação é construída.
@@ -30,6 +31,10 @@ SQLite é adequado para um serviço local ou pequena instância com disco persis
 Não é apropriado compartilhar o arquivo por rede entre réplicas independentes.
 Migração para PostgreSQL só se justifica quando o uso exigir múltiplas instâncias
 ou maior concorrência.
+
+A evolução em `tests/test_concurrency.py` cobre abertura de base com esquema legado
+sem exclusão dos dados e escritas simultâneas. O procedimento de backup/restauração
+está em [BACKUP_AND_RESTORE.md](BACKUP_AND_RESTORE.md); restauração requer servidor parado.
 
 ## Segurança e limitações
 
