@@ -37,6 +37,13 @@ jobs:
           python-version: ${{ matrix.python-version }}
           cache: pip
           cache-dependency-path: requirements.txt
-      - run: python -m pip install -r requirements.txt
-      - run: python -m unittest discover -s tests -v
+      - run: python -m pip install -r requirements-dev.txt
+      - run: coverage run --source=app -m unittest discover -s tests -v
+      - run: coverage report -m
+      - run: coverage xml -o coverage.xml
       - run: python -m compileall -q app tests
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-py${{ matrix.python-version }}
+          path: coverage.xml
