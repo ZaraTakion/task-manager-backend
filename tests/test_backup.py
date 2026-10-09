@@ -2,11 +2,13 @@
 
 from __future__ import annotations
 
+import shutil
 import sqlite3
 import tempfile
 import unittest
 from pathlib import Path
 
+from app.storage import TaskStore
 from scripts.backup_sqlite import backup_database
 
 
@@ -33,6 +35,22 @@ class SQLiteBackupTests(unittest.TestCase):
             connection.execute("INSERT INTO tasks (title) VALUES ('Mais recente')")
         with sqlite3.connect(self.backup) as connection:
             self.assertEqual(connection.execute("SELECT COUNT(*) FROM tasks").fetchone()[0], 1)
+
+    def test_real_task_store_round_trip_restore(self) -> None:
+        database = self.directory / "live-tasks.sqlite3"
+        snapshot = self.directory / "live-tasks-backup.sqlite3"
+        store = TaskStore(database)
+        original = store.create("Antes do backup", completed=True)
+
+        backup_database(database, snapshot)
+        store.create("Após o backup")
+        # No connection remains open: restore is deliberately offline.
+        database.unlink()
+        shutil.copyfile(snapshot, database)
+
+        restored = TaskStore(database)
+        self.assertEqual(restored.list(), [original])
+        self.assertTrue(restored.get(original["id"])["completed"])
 
     def test_never_overwrites_existing_backup(self) -> None:
         backup_database(self.source, self.backup)
