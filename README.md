@@ -118,14 +118,14 @@ python -m pip install -r requirements-dev.txt
 coverage run --source=app -m unittest discover -s tests -v
 coverage report -m
 coverage xml -o coverage.xml
-python -m compileall -q app tests
-ruff check app tests
+python -m compileall -q app tests scripts
+ruff check app tests scripts
 ```
 
 O GitHub Actions verifica lint e executa testes em Python **3.10, 3.11, 3.12
 e 3.13** a cada pull request para `main`. A suíte cobre CRUD, reinicialização
 da aplicação, falhas de validação, isolamento de banco, autenticação opcional
-e integridade transacional. O workflow também exporta `coverage.xml` por versão de Python; a porcentagem não substitui a revisão dos cenários críticos.
+e integridade transacional, compatibilidade do esquema existente, concorrência e backups. O workflow também exporta `coverage.xml` por versão de Python; a porcentagem não substitui a revisão dos cenários críticos.
 
 ## Organização
 
@@ -137,11 +137,29 @@ app/
 tests/
   test_api.py
   test_storage.py
+  test_backup.py
+  test_concurrency.py
+scripts/
+  backup_sqlite.py  # Cria snapshots SQLite consistentes
 docs/
   ARCHITECTURE.md
+  BACKUP_AND_RESTORE.md
+  CASE_STUDY.md
 .github/workflows/
   tests.yml
 ```
+
+### Backup e restauração
+
+Use o backup nativo do SQLite para obter uma cópia consistente sem desligar a API:
+
+```bash
+python scripts/backup_sqlite.py --destination backups/tasks-manual.sqlite3
+```
+
+O arquivo de origem não pode estar ausente e backups já existentes nunca são
+substituídos. **Restaure apenas com o servidor parado**, verificando a integridade
+antes de substituir o banco. Consulte o [guia operacional](docs/BACKUP_AND_RESTORE.md).
 
 O arquivo SQLite deve ficar em volume persistente. Para uso com várias réplicas
 ou servidores, será necessário migrar para um banco compartilhado (por exemplo,
